@@ -1,11 +1,11 @@
 //   Copyright 2009-2012 Joubin Houshyar
-// 
+//
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
 //   You may obtain a copy of the License at
-//    
+//
 //   http://www.apache.org/licenses/LICENSE-2.0
-//    
+//
 //   Unless required by applicable law or agreed to in writing, software
 //   distributed under the License is distributed on an "AS IS" BASIS,
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -128,7 +128,7 @@ type Client interface {
 	// Redis SAVE command.
 	Save() Error
 
-	// Redis KEYS command using "*" wildcard 
+	// Redis KEYS command using "*" wildcard
 	AllKeys() (result []string, err Error)
 
 	// Redis KEYS command.
@@ -349,11 +349,11 @@ type AsyncClient interface {
 	// Redis SAVE command.
 	Save() (status FutureBool, err Error)
 
-	// Redis KEYS command using "*" wildcard 
-	AllKeys() (result FutureKeys, err Error)
+	// Redis KEYS command using "*" wildcard
+	AllKeys() (result FutureBytesArray, err Error)
 
 	// Redis KEYS command.
-	Keys(key string) (result FutureKeys, err Error)
+	Keys(key string) (result FutureBytesArray, err Error)
 
 	// Redis EXISTS command.
 	Exists(key string) (result FutureBool, err Error)
@@ -375,6 +375,21 @@ type AsyncClient interface {
 
 	// Redis MGET command.
 	Mget(key string, arg1 []string) (result FutureBytesArray, err Error)
+
+	// Redis MSET command.
+	Mset(keys []string, vals []string) (status FutureBool, err Error)
+
+	// Redis HGET command.
+	Hget(key string, hashkey string) (result FutureBytes, err Error)
+
+	// Redis HGET command.
+	Hmget(key string, fields []string) (result FutureBytesArray, err Error)
+
+	// Redis HSET command.
+	Hset(arg0 string, arg1 string, arg2 []byte) (stat FutureBool, err Error)
+
+	// Redis HMSET command.
+	Hmset(key string, fields []string, vals []string) (stat FutureBool, err Error)
 
 	// Redis INCR command.
 	Incr(key string) (result FutureInt64, err Error)
@@ -637,7 +652,7 @@ type PubSubChannel <-chan []byte
 // redis:d
 //
 // global debug flag for redis package components.
-// 
+//
 var _debug *bool = flag.Bool("redis:d", false, "debug flag for go-redis") // TEMP: should default to false
 func debug() bool {
 	return *_debug

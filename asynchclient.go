@@ -3,9 +3,9 @@
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
 //   You may obtain a copy of the License at
-//    
+//
 //   http://www.apache.org/licenses/LICENSE-2.0
-//    
+//
 //   Unless required by applicable law or agreed to in writing, software
 //   distributed under the License is distributed on an "AS IS" BASIS,
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -117,10 +117,11 @@ func (c *asyncClient) Save() (stat FutureBool, err Error) {
 }
 
 // Redis KEYS command.
-func (c *asyncClient) AllKeys() (result FutureKeys, err Error) {
+func (c *asyncClient) AllKeys() (result FutureBytesArray, err Error) {
 	return c.Keys("*")
 }
 
+/*
 // Redis KEYS command.
 func (c *asyncClient) Keys(arg0 string) (result FutureKeys, err Error) {
 	arg0bytes := []byte(arg0)
@@ -129,6 +130,16 @@ func (c *asyncClient) Keys(arg0 string) (result FutureKeys, err Error) {
 	resp, err = c.conn.QueueRequest(&KEYS, [][]byte{arg0bytes})
 	if err == nil {
 		result = newFutureKeys(resp.future.(FutureBytes))
+	}
+	return result, err
+} */
+func (c *asyncClient) Keys(arg0 string) (result FutureBytesArray, err Error) {
+	arg0bytes := []byte(arg0)
+
+	var resp *PendingResponse
+	resp, err = c.conn.QueueRequest(&KEYS, [][]byte{arg0bytes})
+	if err == nil {
+		result = resp.future.(FutureBytesArray)
 	}
 	return result, err
 }
@@ -230,6 +241,28 @@ func (c *asyncClient) Mget(arg0 string, arg1 []string) (result FutureBytesArray,
 		result = resp.future.(FutureBytesArray)
 	}
 	return result, err
+
+}
+
+// Redis MSET command.
+func (c *asyncClient) Mset(keys []string, vals []string) (stat FutureBool, err Error) {
+	if len(keys) != len(vals) {
+		err = newSystemError("keys length MUST be same as vals length.")
+		return stat, err
+	}
+	arg_vec := []string{vals[0]}
+	for i := 1; i < len(keys); i++ {
+		arg_vec = append(arg_vec, keys[i])
+		arg_vec = append(arg_vec, vals[i])
+	}
+	args := appendAndConvert(keys[0], arg_vec...)
+
+	var resp *PendingResponse
+	resp, err = c.conn.QueueRequest(&MSET, args)
+	if err == nil {
+		stat = resp.future.(FutureBool)
+	}
+	return stat, err
 
 }
 
@@ -860,6 +893,19 @@ func (c *asyncClient) Hget(arg0 string, arg1 string) (result FutureBytes, err Er
 
 }
 
+// Redis HMGET command.
+func (c *asyncClient) Hmget(key string, fields []string) (result FutureBytesArray, err Error) {
+	args := appendAndConvert(key, fields...)
+
+	var resp *PendingResponse
+	resp, err = c.conn.QueueRequest(&HMGET, args)
+	if err == nil {
+		result = resp.future.(FutureBytesArray)
+	}
+	return result, err
+
+}
+
 // Redis HSET command.
 func (c *asyncClient) Hset(arg0 string, arg1 string, arg2 []byte) (stat FutureBool, err Error) {
 	arg0bytes := []byte(arg0)
@@ -867,6 +913,27 @@ func (c *asyncClient) Hset(arg0 string, arg1 string, arg2 []byte) (stat FutureBo
 	arg2bytes := arg2
 
 	resp, err := c.conn.QueueRequest(&HSET, [][]byte{arg0bytes, arg1bytes, arg2bytes})
+	if err == nil {
+		stat = resp.future.(FutureBool)
+	}
+
+	return
+}
+
+// Redis HMSET command.
+func (c *asyncClient) Hmset(key string, fields []string, vals []string) (stat FutureBool, err Error) {
+	if len(fields) != len(vals) {
+		err = newSystemError("fields length MUST be same as vals length.")
+		return stat, err
+	}
+	args_vec := []string{}
+	for i := 0; i < len(fields); i++ {
+		args_vec = append(args_vec, fields[i])
+		args_vec = append(args_vec, vals[i])
+	}
+	args := appendAndConvert(key, args_vec...)
+
+	resp, err := c.conn.QueueRequest(&HMSET, args)
 	if err == nil {
 		stat = resp.future.(FutureBool)
 	}
