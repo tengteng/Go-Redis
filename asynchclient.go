@@ -1049,3 +1049,33 @@ func (c *asyncClient) Zrevrank(arg0 string, arg1 []byte) (result FutureInt64, er
 
 	return result, err
 }
+
+// Redis GEOADD command.
+func (c *asyncClient) Geoadd(key string, lats []string, lngs []string, vals []string) (result FutureInt64, err Error) {
+	if len(lats) != len(lngs) {
+		err = newRedisError("Num of latitudes MUST equal with num of longitude.")
+	}
+	if len(lats) != len(vals) {
+		err = newRedisError("Num of latitudes MUST equal with num of values.")
+	}
+	if len(lats) == 0 {
+		err = newRedisError("Num of latitudes can't be 0.")
+	}
+	if err != nil {
+		return result, err
+	}
+
+	args_vec := []string{}
+	for i := 0; i < len(lats); i++ {
+		args_vec = append(args_vec, lats[i])
+		args_vec = append(args_vec, lngs[i])
+		args_vec = append(args_vec, vals[i])
+	}
+	args := appendAndConvert(key, args_vec...)
+
+	resp, err := c.conn.QueueRequest(&GEOADD, args)
+	if err == nil {
+		result = resp.future.(FutureInt64)
+	}
+	return result, err
+}
