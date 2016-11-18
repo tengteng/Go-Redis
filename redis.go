@@ -376,19 +376,19 @@ type AsyncClient interface {
 	// Redis MGET command.
 	Mget(key string, arg1 []string) (result FutureBytesArray, err Error)
 
-	// Redis MSET command. by tengteng.
+	// Redis MSET command.
 	Mset(keys []string, vals [][]byte) (status FutureBool, err Error)
 
 	// Redis HGET command.
 	Hget(key string, hashkey string) (result FutureBytes, err Error)
 
-	// Redis HGET command. By tengteng.
+	// Redis HGET command.
 	Hmget(key string, fields []string) (result FutureBytesArray, err Error)
 
 	// Redis HSET command.
 	Hset(arg0 string, arg1 string, arg2 []byte) (stat FutureBool, err Error)
 
-	// Redis HMSET command. by tengteng.
+	// Redis HMSET command.
 	Hmset(key string, fields []string, vals []string) (stat FutureBool, err Error)
 
 	// Redis INCR command.
@@ -541,6 +541,14 @@ type AsyncClient interface {
 
 	// Redis ZREVRANK command.
 	Zrevrank(key string, arg1 []byte) (result FutureInt64, err Error)
+
+	// Redis GEOADD command.
+	Georadius(key string, lat float64, lng float64,
+		float64, unit string) (result FutureBytesArray, err Error)
+
+	// Redis GEORADIUS command.
+	Geoadd(key string, lats []float64, lngs []float64,
+		vals [][]byte) (result FutureInt64, err Error)
 }
 
 // REVU - ALL THE COMMENS NEEDS REVIEW AND REVISION
