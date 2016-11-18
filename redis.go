@@ -376,19 +376,19 @@ type AsyncClient interface {
 	// Redis MGET command.
 	Mget(key string, arg1 []string) (result FutureBytesArray, err Error)
 
-	// Redis MSET command.
-	Mset(keys []string, vals []string) (status FutureBool, err Error)
+	// Redis MSET command. by tengteng.
+	Mset(keys []string, vals [][]byte) (status FutureBool, err Error)
 
 	// Redis HGET command.
 	Hget(key string, hashkey string) (result FutureBytes, err Error)
 
-	// Redis HGET command.
+	// Redis HGET command. By tengteng.
 	Hmget(key string, fields []string) (result FutureBytesArray, err Error)
 
 	// Redis HSET command.
 	Hset(arg0 string, arg1 string, arg2 []byte) (stat FutureBool, err Error)
 
-	// Redis HMSET command.
+	// Redis HMSET command. by tengteng.
 	Hmset(key string, fields []string, vals []string) (stat FutureBool, err Error)
 
 	// Redis INCR command.
@@ -535,6 +535,12 @@ type AsyncClient interface {
 	// Returns the future for number of PubSub subscribers that received the message.
 	// OR error if any.
 	Publish(channel string, message []byte) (recieverCountFuture FutureInt64, err Error)
+
+	// Redis ZRANK command.
+	Zrank(key string, arg1 []byte) (result FutureInt64, err Error)
+
+	// Redis ZREVRANK command.
+	Zrevrank(key string, arg1 []byte) (result FutureInt64, err Error)
 }
 
 // REVU - ALL THE COMMENS NEEDS REVIEW AND REVISION

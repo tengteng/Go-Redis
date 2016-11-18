@@ -176,6 +176,8 @@ var (
 	ZADD          Command = Command{"ZADD", KEY_IDX_VALUE, BOOLEAN}
 	ZREM          Command = Command{"ZREM", KEY_VALUE, BOOLEAN}
 	ZCARD         Command = Command{"ZCARD", KEY, NUMBER}
+	ZRANK         Command = Command{"ZRANK", KEY_VALUE, NUMBER}
+	ZREVRANK      Command = Command{"ZREVRANK", KEY_VALUE, NUMBER}
 	ZSCORE        Command = Command{"ZSCORE", KEY_VALUE, BULK}
 	ZRANGE        Command = Command{"ZRANGE", KEY_NUM_NUM, MULTI_BULK}
 	ZREVRANGE     Command = Command{"ZREVRANGE", KEY_NUM_NUM, MULTI_BULK}

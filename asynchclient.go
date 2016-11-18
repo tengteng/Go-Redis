@@ -244,21 +244,21 @@ func (c *asyncClient) Mget(arg0 string, arg1 []string) (result FutureBytesArray,
 
 }
 
-// Redis MSET command.
-func (c *asyncClient) Mset(keys []string, vals []string) (stat FutureBool, err Error) {
+// Redis MSET command.  By tengteng. TODO: vals should be [][]byte not []string.
+func (c *asyncClient) Mset(keys []string, vals [][]byte) (stat FutureBool, err Error) {
 	if len(keys) != len(vals) {
 		err = newSystemError("keys length MUST be same as vals length.")
 		return stat, err
 	}
-	arg_vec := []string{vals[0]}
-	for i := 1; i < len(keys); i++ {
-		arg_vec = append(arg_vec, keys[i])
+	arg_vec := [][]byte{}
+	for i := 0; i < len(keys); i++ {
+		arg_vec = append(arg_vec, []byte(keys[i]))
 		arg_vec = append(arg_vec, vals[i])
 	}
-	args := appendAndConvert(keys[0], arg_vec...)
+	// args := appendAndConvert(keys[0], arg_vec...)
 
 	var resp *PendingResponse
-	resp, err = c.conn.QueueRequest(&MSET, args)
+	resp, err = c.conn.QueueRequest(&MSET, arg_vec)
 	if err == nil {
 		stat = resp.future.(FutureBool)
 	}
@@ -893,7 +893,7 @@ func (c *asyncClient) Hget(arg0 string, arg1 string) (result FutureBytes, err Er
 
 }
 
-// Redis HMGET command.
+// Redis HMGET command. by tengteng.
 func (c *asyncClient) Hmget(key string, fields []string) (result FutureBytesArray, err Error) {
 	args := appendAndConvert(key, fields...)
 
@@ -920,7 +920,7 @@ func (c *asyncClient) Hset(arg0 string, arg1 string, arg2 []byte) (stat FutureBo
 	return
 }
 
-// Redis HMSET command.
+// Redis HMSET command. by tengteng.
 func (c *asyncClient) Hmset(key string, fields []string, vals []string) (stat FutureBool, err Error) {
 	if len(fields) != len(vals) {
 		err = newSystemError("fields length MUST be same as vals length.")
@@ -1018,5 +1018,34 @@ func (c *asyncClient) Publish(arg0 string, arg1 []byte) (result FutureInt64, err
 	if err == nil {
 		result = resp.future.(FutureInt64)
 	}
+	return result, err
+}
+
+// Redis ZRANK command.
+func (c *asyncClient) Zrank(arg0 string, arg1 []byte) (result FutureInt64, err Error) {
+	arg0bytes := []byte(arg0)
+	arg1bytes := arg1
+
+	var resp *PendingResponse
+	resp, err = c.conn.QueueRequest(&ZRANK, [][]byte{arg0bytes, arg1bytes})
+	if err == nil {
+		result = resp.future.(FutureInt64)
+	}
+
+	return result, err
+
+}
+
+// Redis ZREVRANK command.
+func (c *asyncClient) Zrevrank(arg0 string, arg1 []byte) (result FutureInt64, err Error) {
+	arg0bytes := []byte(arg0)
+	arg1bytes := arg1
+
+	var resp *PendingResponse
+	resp, err = c.conn.QueueRequest(&ZREVRANK, [][]byte{arg0bytes, arg1bytes})
+	if err == nil {
+		result = resp.future.(FutureInt64)
+	}
+
 	return result, err
 }
