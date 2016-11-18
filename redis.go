@@ -543,12 +543,12 @@ type AsyncClient interface {
 	Zrevrank(key string, arg1 []byte) (result FutureInt64, err Error)
 
 	// Redis GEOADD command.
-	Georadius(key string, lat float64, lng float64,
-		float64, unit string) (result FutureBytesArray, err Error)
-
-	// Redis GEORADIUS command.
 	Geoadd(key string, lats []float64, lngs []float64,
 		vals [][]byte) (result FutureInt64, err Error)
+
+	// Redis GEORADIUS command.
+	Georadius(key string, lat float64, lng float64, range_num float64,
+		unit string) (result FutureBytesArray, err Error)
 }
 
 // REVU - ALL THE COMMENS NEEDS REVIEW AND REVISION
