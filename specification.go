@@ -173,6 +173,7 @@ var (
 	HSET          Command = Command{"HSET", KEY_KEY_VALUE, STATUS}
 	HMSET         Command = Command{"HMSET", MULTI_KEY, STATUS}
 	HGETALL       Command = Command{"HGETALL", KEY, MULTI_BULK}
+	GEOADD        Command = Command{"GEOADD", MULTI_KEY, NUMBER}
 	ZADD          Command = Command{"ZADD", KEY_IDX_VALUE, BOOLEAN}
 	ZREM          Command = Command{"ZREM", KEY_VALUE, BOOLEAN}
 	ZCARD         Command = Command{"ZCARD", KEY, NUMBER}
