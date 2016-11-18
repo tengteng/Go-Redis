@@ -1037,12 +1037,14 @@ func (c *asyncClient) Zrank(arg0 string, arg1 []byte) (result FutureInt64, err E
 }
 
 // Redis ZREVRANK command.
-func (c *asyncClient) Zrevrank(arg0 string, arg1 []byte) (result FutureInt64, err Error) {
+func (c *asyncClient) Zrevrank(arg0 string, arg1 []byte) (result FutureInt64,
+	err Error) {
 	arg0bytes := []byte(arg0)
 	arg1bytes := arg1
 
 	var resp *PendingResponse
-	resp, err = c.conn.QueueRequest(&ZREVRANK, [][]byte{arg0bytes, arg1bytes})
+	resp, err = c.conn.QueueRequest(&ZREVRANK,
+		[][]byte{arg0bytes, arg1bytes})
 	if err == nil {
 		result = resp.future.(FutureInt64)
 	}
@@ -1051,12 +1053,15 @@ func (c *asyncClient) Zrevrank(arg0 string, arg1 []byte) (result FutureInt64, er
 }
 
 // Redis GEOADD command.
-func (c *asyncClient) Geoadd(key string, lats []string, lngs []string, vals []string) (result FutureInt64, err Error) {
+func (c *asyncClient) Geoadd(key string, lats []float64, lngs []float64,
+	vals []string) (result FutureInt64, err Error) {
 	if len(lats) != len(lngs) {
-		err = newRedisError("Num of latitudes MUST equal with num of longitude.")
+		err = newRedisError(
+			"Num of latitudes MUST equal with num of longitude.")
 	}
 	if len(lats) != len(vals) {
-		err = newRedisError("Num of latitudes MUST equal with num of values.")
+		err = newRedisError(
+			"Num of latitudes MUST equal with num of values.")
 	}
 	if len(lats) == 0 {
 		err = newRedisError("Num of latitudes can't be 0.")
@@ -1067,8 +1072,10 @@ func (c *asyncClient) Geoadd(key string, lats []string, lngs []string, vals []st
 
 	args_vec := []string{}
 	for i := 0; i < len(lats); i++ {
-		args_vec = append(args_vec, lats[i])
-		args_vec = append(args_vec, lngs[i])
+		args_vec = append(
+			args_vec, strconv.FormatFloat(lats[i], 'f', 6, 64))
+		args_vec = append(
+			args_vec, strconv.FormatFloat(lngs[i], 'f', 6, 64))
 		args_vec = append(args_vec, vals[i])
 	}
 	args := appendAndConvert(key, args_vec...)
@@ -1076,6 +1083,21 @@ func (c *asyncClient) Geoadd(key string, lats []string, lngs []string, vals []st
 	resp, err := c.conn.QueueRequest(&GEOADD, args)
 	if err == nil {
 		result = resp.future.(FutureInt64)
+	}
+	return result, err
+}
+
+// Redis GEORADIUS command.
+func (c *asyncClient) Georadius(key string, lat float64, lng float64,
+	range_num float64, unit string) (result FutureBytesArray, err Error) {
+	args := [][]byte{[]byte(key)}
+	args = append(args, []byte(strconv.FormatFloat(lat, 'f', 6, 64)))
+	args = append(args, []byte(strconv.FormatFloat(lng, 'f', 6, 64)))
+	args = append(args, []byte(strconv.FormatFloat(range_num, 'f', 3, 64)))
+
+	resp, err := c.conn.QueueRequest(&GEORADIUS, args)
+	if err == nil {
+		result = resp.future.(FutureBytesArray)
 	}
 	return result, err
 }
